@@ -260,16 +260,34 @@ function renderInstructions(){
 function renderReading(){
   card.innerHTML = `
     <div class="timer-badge">Skaitymas vyksta</div>
-    <div class="reading-text">${READING_TEXT}</div>
+
+    <div class="reading-text" id="readingText">
+      ${READING_TEXT}
+    </div>
+
     <div class="btn-row">
-      <button class="btn" id="finishReadBtn">Perskaičiau</button>
+      <button class="btn" id="finishReadBtn" disabled>Perskaičiau</button>
     </div>
   `;
-  document.getElementById("finishReadBtn").onclick = () => {
+
+  const readingText = document.getElementById("readingText");
+  const finishBtn = document.getElementById("finishReadBtn");
+
+  readingText.addEventListener("scroll", () => {
+    const reachedBottom =
+      readingText.scrollTop + readingText.clientHeight >= readingText.scrollHeight - 5;
+
+    if (reachedBottom) {
+      finishBtn.disabled = false;
+    }
+  });
+
+  finishBtn.onclick = () => {
     const elapsedMs = Date.now() - state.readingStart;
     const minutes = elapsedMs / 60000;
     const words = wordCount(READING_TEXT);
     state.wpm = minutes > 0 ? Math.round(words / minutes) : null;
+
     state.step = "comprehension";
     render();
   };
