@@ -95,8 +95,32 @@ const state = {
   surveyAnswers: {},
   readingStart: null,
   wpm: null,
-  compAnswers: {}
+  compAnswers: {},
+  leftTab: false,
+  leftTabCount: 0
 };
+
+//Sekimas, ar useris paliko tabą/langą TIK skaitymo (reading) etapo metu.
+function handleVisibilityChange(){
+  if(document.hidden){
+    state.leftTab = true;
+    state.leftTabCount++;
+  }
+}
+function handleWindowBlur(){
+  state.leftTab = true;
+  state.leftTabCount++;
+}
+function startTabTracking(){
+  state.leftTab = false;
+  state.leftTabCount = 0;
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+  window.addEventListener("blur", handleWindowBlur);
+}
+function stopTabTracking(){
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
+  window.removeEventListener("blur", handleWindowBlur);
+}
 
 function wordCount(text){
   return text.trim().split(/\s+/).filter(Boolean).length;
@@ -258,6 +282,7 @@ function renderInstructions(){
 }
 
 function renderReading(){
+  startTabTracking();
   card.innerHTML = `
     <div class="timer-badge">Skaitymas vyksta</div>
 
@@ -282,6 +307,7 @@ function renderReading(){
   });
 
   finishBtn.onclick = () => {
+    stopTabTracking();
     const elapsedMs = Date.now() - state.readingStart;
     const minutes = elapsedMs / 60000;
     const words = wordCount(READING_TEXT);
