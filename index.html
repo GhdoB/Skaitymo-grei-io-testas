@@ -392,7 +392,9 @@ async function submitResults(){
   const { error } = await supabaseClient.from("responses").insert({
     survey_answers: state.surveyAnswers,
     wpm: state.wpm,
-    comprehension_answers: state.compAnswers
+    comprehension_answers: state.compAnswers,
+    left_tab: state.leftTab,
+    left_tab_count: state.leftTabCount
   });
   if(error){
     console.error(error);
