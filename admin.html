@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Tyrimo rezultatai</title>
+<link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+
+<div id="root"></div>
+
+<script>
+const root = document.getElementById("root");
+let allResults = [];
+
+function renderLogin(errorMsg){
+  root.innerHTML = `
+    <div class="login-box">
+      <h1>Admin prieiga</h1>
+      <p class="sub">Įrašyk slaptažodį rezultatams peržiūrėti.</p>
+      <input type="password" id="pw" placeholder="Slaptažodis">
+      <button id="loginBtn">Prisijungti</button>
+      ${errorMsg ? `<p class="error">${errorMsg}</p>` : ""}
+    </div>
+  `;
+  document.getElementById("loginBtn").onclick = () => login(document.getElementById("pw").value);
+  document.getElementById("pw").addEventListener("keydown", e => {
+    if(e.key === "Enter") login(document.getElementById("pw").value);
+  });
+}
+
+async function login(password){
+  root.innerHTML = `<div class="login-box"><p>Kraunama...</p></div>`;
+  try{
+    const res = await fetch(`/api/admin-results?password=${encodeURIComponent(password)}`);
+    const data = await res.json();
+    if(!res.ok){
+      renderLogin(data.error || "Klaida.");
+      return;
+    }
+    allResults = data.results;
+    sessionStorage.setItem("admin_pw", password);
+    renderResults();
+  } catch(e){
+    renderLogin("Nepavyko prisijungti prie serverio.");
+  }
+}
+
+function renderResults(){
+  const wpmValues = allResults.map(r => r.wpm).filter(v => v != null);
+  const avgWpm = wpmValues.length ? Math.round(wpmValues.reduce((a,b)=>a+b,0)/wpmValues.length) : "—";
+
+  root.innerHTML = `
+    <div class="toolbar">
+      <div>
+        <h1>Tyrimo rezultatai</h1>
+        <p class="sub">Iš viso įrašų: ${allResults.length}</p>
+      </div>
+      <button id="exportBtn">Eksportuoti CSV</button>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><b>${allResults.length}</b>dalyvių</div>
+      <div class="stat"><b>${avgWpm}</b>vidutinis WPM</div>
+    </div>
+    <div style="overflow:auto; max-height:70vh;">
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>WPM</th>
+            <th>Apklausos atsakymai</th>
+            <th>Supratimo atsakymai</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${allResults.map(r => `
+            <tr>
+              <td>${new Date(r.created_at).toLocaleString("lt-LT")}</td>
+              <td>${r.wpm ?? "—"}</td>
+              <td>${formatJson(r.survey_answers)}</td>
+              <td>${formatJson(r.comprehension_answers)}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+  document.getElementById("exportBtn").onclick = exportCsv;
+}
+
+function formatJson(obj){
+  if(!obj) return "—";
+  return Object.entries(obj).map(([k,v]) => `${k}: ${v}`).join("<br>");
+}
+
+function exportCsv(){
+  const keysSurvey = [...new Set(allResults.flatMap(r => Object.keys(r.survey_answers || {})))];
+  const keysComp = [...new Set(allResults.flatMap(r => Object.keys(r.comprehension_answers || {})))];
+  const header = ["created_at", "wpm", ...keysSurvey, ...keysComp.map(k => "comp_" + k)];
+  const rows = allResults.map(r => {
+    const row = [
+      r.created_at,
+      r.wpm ?? "",
+      ...keysSurvey.map(k => csvSafe((r.survey_answers || {})[k])),
+      ...keysComp.map(k => csvSafe((r.comprehension_answers || {})[k]))
+    ];
+    return row.join(",");
+  });
+  const csv = [header.join(","), ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "tyrimo_rezultatai.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function csvSafe(val){
+  if(val == null) return "";
+  const s = String(val).replace(/"/g, '""');
+  return `"${s}"`;
+}
+
+// Jei slaptažodis jau įvestas šioje sesijoje, bandom prisijungti automatiškai
+const savedPw = sessionStorage.getItem("admin_pw");
+if(savedPw){
+  login(savedPw);
+} else {
+  renderLogin();
+}
+</script>
+</body>
+</html>

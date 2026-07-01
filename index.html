@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skaitymo greičio tyrimas</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="app">
+  <div class="card" id="card">Kraunama...</div>
+  <footer>Duomenys renkami anonimiškai · tyrimo tikslais</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+
+
+const STUDY_INTRO = {
+  title: "TYRIMO PAVADINIMAS",
+  description: "TYRIMO APRAŠYMAS — paaiškink, ko tyrimas siekia, kiek laiko užtruks, kad dalyvavimas anonimiškas ir savanoriškas."
+};
+
+// Pradinės apklausos klausimai (rodomi po vieną)
+const SURVEY_QUESTIONS = [
+  { id: "q1", text: "ČIA KLAUSIMAS 1", type: "choice", options: ["ČIA VARIANTAS A", "ČIA VARIANTAS B", "ČIA VARIANTAS C"] },
+  { id: "q2", text: "ČIA KLAUSIMAS 2", type: "choice", options: ["ČIA VARIANTAS A", "ČIA VARIANTAS B", "ČIA VARIANTAS C"] },
+  { id: "q3", text: "ČIA KLAUSIMAS 3", type: "text" },
+  { id: "q4", text: "ČIA KLAUSIMAS 4", type: "choice", options: ["ČIA VARIANTAS A", "ČIA VARIANTAS B"] },
+  { id: "q5", text: "ČIA KLAUSIMAS 5", type: "choice", options: ["ČIA VARIANTAS A", "ČIA VARIANTAS B", "ČIA VARIANTAS C"] }
+];
+
+// Skaitymo testo instrukcija
+const TEST_INSTRUCTIONS = "ČIA TESTO INSTRUKCIJOS TEKSTAS";
+
+// Skaitymo tekstas (WPM skaičiuojamas iš žodžių šiame tekste)
+const READING_TEXT = `SKAITYMO TEKSTAS. `;
+
+// Supratimo klausimai po skaitymo testo
+const COMPREHENSION_QUESTIONS = [
+  { id: "c1", text: "ČIA SUPRATIMO KLAUSIMAS 1", type: "text" },
+  { id: "c2", text: "ČIA SUPRATIMO KLAUSIMAS 2", type: "choice", options: ["ČIA VARIANTAS A", "ČIA VARIANTAS B", "ČIA VARIANTAS C"] },
+  { id: "c3", text: "ČIA SUPRATIMO KLAUSIMAS 3", type: "text" }
+];
+
+/* ============================================================
+   KODAS
+   ============================================================ */
+
+const card = document.getElementById("card");
+
+// Apsauginis tikrinimas: jei config.js arba Supabase biblioteka
+// neužsikrovė, parodom aiškią klaidą vietoj tuščio puslapio.
+let supabaseClient;
+try{
+  if(typeof SUPABASE_URL === "undefined" || typeof SUPABASE_ANON_KEY === "undefined"){
+    throw new Error("config.js nerastas arba jame trūksta SUPABASE_URL / SUPABASE_ANON_KEY.");
+  }
+  if(!window.supabase){
+    throw new Error("Supabase biblioteka neužsikrovė (CDN blokuojamas arba nėra interneto).");
+  }
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch(initErr){
+  console.error("Inicializacijos klaida:", initErr);
+  card.innerHTML = `
+    <h1>Nepavyko įkelti tyrimo</h1>
+    <p>Techninė klaida: ${initErr.message}</p>
+    <p style="font-size:13px;">Patikrink naršyklės Console (F12) papildomai informacijai.</p>
+  `;
+  throw initErr; // sustabdom, kad likęs kodas nebandytų veikti be supabase
+}
+
+const state = {
+  step: "landing", // landing -> survey -> instructions -> reading -> comprehension -> done
+  surveyIndex: 0,
+  surveyAnswers: {},
+  readingStart: null,
+  wpm: null,
+  compAnswers: {}
+};
+
+function wordCount(text){
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function render(){
+  if(state.step === "landing") return renderLanding();
+  if(state.step === "survey") return renderSurvey();
+  if(state.step === "instructions") return renderInstructions();
+  if(state.step === "reading") return renderReading();
+  if(state.step === "comprehension") return renderComprehension();
+  if(state.step === "saving") return renderSaving();
+  if(state.step === "done") return renderDone();
+  if(state.step === "error") return renderError();
+}
+
+function renderLanding(){
+  card.innerHTML = `
+    <p class="eyebrow">Tyrimas</p>
+    <h1>${STUDY_INTRO.title}</h1>
+    <p>${STUDY_INTRO.description}</p>
+    <div class="btn-row">
+      <button class="btn" id="startBtn">Pradėti</button>
+    </div>
+  `;
+  document.getElementById("startBtn").onclick = () => {
+    state.step = "survey";
+    state.surveyIndex = 0;
+    render();
+  };
+}
+
+function renderSurvey(){
+  const q = SURVEY_QUESTIONS[state.surveyIndex];
+  const total = SURVEY_QUESTIONS.length;
+  const pct = Math.round(((state.surveyIndex) / total) * 100);
+
+  let inputHtml = "";
+  if(q.type === "choice"){
+    inputHtml = `<div class="options">` + q.options.map((opt,i) => {
+      const selected = state.surveyAnswers[q.id] === opt ? "selected" : "";
+      return `<button class="option ${selected}" data-opt="${i}">${opt}</button>`;
+    }).join("") + `</div>`;
+  } else {
+    const val = state.surveyAnswers[q.id] || "";
+    inputHtml = `<input type="text" id="textAnswer" value="${val.replace(/"/g,'&quot;')}" placeholder="Įrašyk atsakymą">`;
+  }
+
+  card.innerHTML = `
+    <div class="progress">Klausimas ${state.surveyIndex+1} / ${total}
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="question-text">${q.text}</div>
+    ${inputHtml}
+    <div class="btn-row">
+      <button class="btn" id="nextBtn" ${!state.surveyAnswers[q.id] ? "disabled" : ""}>
+        ${state.surveyIndex === total-1 ? "Toliau" : "Toliau"}
+      </button>
+    </div>
+  `;
+
+  if(q.type === "choice"){
+    document.querySelectorAll(".option").forEach(btn => {
+      btn.onclick = () => {
+        state.surveyAnswers[q.id] = q.options[btn.dataset.opt];
+        renderSurvey();
+      };
+    });
+  } else {
+    const input = document.getElementById("textAnswer");
+    input.oninput = () => {
+      state.surveyAnswers[q.id] = input.value;
+      document.getElementById("nextBtn").disabled = !input.value.trim();
+    };
+  }
+
+  document.getElementById("nextBtn").onclick = () => {
+    if(!state.surveyAnswers[q.id]) return;
+    if(state.surveyIndex < total - 1){
+      state.surveyIndex++;
+      renderSurvey();
+    } else {
+      state.step = "instructions";
+      render();
+    }
+  };
+}
+
+function renderInstructions(){
+  card.innerHTML = `
+    <p class="eyebrow">Skaitymo testas</p>
+    <h1>Instrukcija</h1>
+    <p>${TEST_INSTRUCTIONS}</p>
+    <div class="btn-row">
+      <button class="btn" id="beginReadBtn">Pradėti</button>
+    </div>
+  `;
+  document.getElementById("beginReadBtn").onclick = () => {
+    state.step = "reading";
+    state.readingStart = Date.now();
+    render();
+  };
+}
+
+function renderReading(){
+  card.innerHTML = `
+    <div class="timer-badge">Skaitymas vyksta</div>
+    <div class="reading-text">${READING_TEXT}</div>
+    <div class="btn-row">
+      <button class="btn" id="finishReadBtn">Baigti</button>
+    </div>
+  `;
+  document.getElementById("finishReadBtn").onclick = () => {
+    const elapsedMs = Date.now() - state.readingStart;
+    const minutes = elapsedMs / 60000;
+    const words = wordCount(READING_TEXT);
+    state.wpm = minutes > 0 ? Math.round(words / minutes) : null;
+    state.step = "comprehension";
+    render();
+  };
+}
+
+function renderComprehension(){
+  const allAnswered = COMPREHENSION_QUESTIONS.every(q => state.compAnswers[q.id]);
+  card.innerHTML = `
+    <p class="eyebrow">Supratimo klausimai</p>
+    <h1>Atsakyk trumpai</h1>
+    ${COMPREHENSION_QUESTIONS.map(q => {
+      if(q.type === "choice"){
+        return `<div class="comp-question">
+          <label>${q.text}</label>
+          <div class="options">
+            ${q.options.map((opt,i) => {
+              const selected = state.compAnswers[q.id] === opt ? "selected" : "";
+              return `<button class="option ${selected}" data-qid="${q.id}" data-opt="${i}">${opt}</button>`;
+            }).join("")}
+          </div>
+        </div>`;
+      }
+      const val = state.compAnswers[q.id] || "";
+      return `<div class="comp-question">
+        <label>${q.text}</label>
+        <textarea data-qid="${q.id}">${val}</textarea>
+      </div>`;
+    }).join("")}
+    <div class="btn-row">
+      <button class="btn" id="finishTestBtn" ${allAnswered ? "" : "disabled"}>Baigti testą</button>
+    </div>
+  `;
+
+  document.querySelectorAll(".comp-question .option").forEach(btn => {
+    btn.onclick = () => {
+      const q = COMPREHENSION_QUESTIONS.find(q => q.id === btn.dataset.qid);
+      state.compAnswers[q.id] = q.options[btn.dataset.opt];
+      renderComprehension();
+    };
+  });
+  document.querySelectorAll(".comp-question textarea").forEach(ta => {
+    ta.oninput = () => {
+      state.compAnswers[ta.dataset.qid] = ta.value;
+      document.getElementById("finishTestBtn").disabled =
+        !COMPREHENSION_QUESTIONS.every(q => state.compAnswers[q.id] && state.compAnswers[q.id].trim());
+    };
+  });
+
+  document.getElementById("finishTestBtn").onclick = submitResults;
+}
+
+function renderSaving(){
+  card.innerHTML = `<p class="center">Saugoma...</p>`;
+}
+
+function renderDone(){
+  card.innerHTML = `
+    <h1>Ačiū!</h1>
+    <p>Tavo atsakymai išsaugoti anonimiškai. Tyrimas baigtas.</p>
+  `;
+}
+
+function renderError(){
+  card.innerHTML = `
+    <h1>Nepavyko išsaugoti</h1>
+    <p>Įvyko klaida jungiantis prie serverio. Patikrink interneto ryšį ir bandyk dar kartą.</p>
+    <div class="btn-row">
+      <button class="btn" id="retryBtn">Bandyti dar kartą</button>
+    </div>
+  `;
+  document.getElementById("retryBtn").onclick = submitResults;
+}
+
+async function submitResults(){
+  state.step = "saving";
+  render();
+  const { error } = await supabaseClient.from("responses").insert({
+    survey_answers: state.surveyAnswers,
+    wpm: state.wpm,
+    comprehension_answers: state.compAnswers
+  });
+  if(error){
+    console.error(error);
+    state.step = "error";
+    render();
+    return;
+  }
+  state.step = "done";
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
