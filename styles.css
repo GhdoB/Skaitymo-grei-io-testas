@@ -12,7 +12,7 @@ body{
   margin:0;
   background:var(--paper);
   color:var(--ink);
-  font-family:'Iowan Old Style','Palatino Linotype',Georgia,serif;
+  font-family:'Helvetica', 'sans-serif';
   min-height:100vh;
   display:flex;
   align-items:center;
@@ -31,7 +31,7 @@ body{
   box-shadow:0 1px 3px rgba(43,38,32,0.06);
 }
 .eyebrow{
-  font-family:'Courier New',monospace;
+  font-family:'Helvetica', 'sans-serif';
   font-size:12px;
   letter-spacing:0.14em;
   text-transform:uppercase;
@@ -51,7 +51,7 @@ p{
   margin:0 0 16px;
 }
 .btn{
-  font-family:'Courier New',monospace;
+  font-family:'Helvetica', 'sans-serif';
   font-size:14px;
   letter-spacing:0.04em;
   text-transform:uppercase;
@@ -68,7 +68,7 @@ p{
 .btn:disabled{opacity:.4;cursor:not-allowed;}
 .btn-row{margin-top:28px;display:flex;justify-content:flex-end;gap:12px;}
 .progress{
-  font-family:'Courier New',monospace;
+  font-family:'Helvetica', 'sans-serif';
   font-size:12px;
   color:var(--ink-soft);
   letter-spacing:0.08em;
@@ -129,7 +129,7 @@ textarea{min-height:90px;resize:vertical;}
   margin-bottom:28px;
 }
 .timer-badge{
-  font-family:'Courier New',monospace;
+  font-family:'Helvetica', 'sans-serif';
   font-size:12px;
   color:var(--ink-soft);
   letter-spacing:0.1em;
@@ -147,7 +147,7 @@ textarea{min-height:90px;resize:vertical;}
 .error-msg{color:var(--accent);font-size:13px;margin-top:8px;}
 footer{
   text-align:center;
-  font-family:'Courier New',monospace;
+  font-family:'Helvetica', 'sans-serif';
   font-size:11px;
   color:var(--ink-soft);
   margin-top:18px;
