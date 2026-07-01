@@ -70,7 +70,7 @@ try{
     <p>Techninė klaida: ${initErr.message}</p>
     <p style="font-size:13px;">Patikrink naršyklės Console (F12) papildomai informacijai.</p>
   `;
-  throw initErr; // sustabdom, kad likęs kodas nebandytų veikti be supabase
+  throw initErr; // stop, kad likęs kodas nebandytų veikti be supabase
 }
 
 const state = {
@@ -229,7 +229,6 @@ else if (!state.surveyAnswers[q.id]) {
 function renderInstructions(){
   card.innerHTML = `
     <p class="eyebrow">Skaitymo testas</p>
-    <h1>Instrukcija</h1>
     <p>${TEST_INSTRUCTIONS}</p>
     <div class="btn-row">
       <button class="btn" id="beginReadBtn">Pradėti</button>
@@ -247,7 +246,7 @@ function renderReading(){
     <div class="timer-badge">Skaitymas vyksta</div>
     <div class="reading-text">${READING_TEXT}</div>
     <div class="btn-row">
-      <button class="btn" id="finishReadBtn">Baigti</button>
+      <button class="btn" id="finishReadBtn">Perskaičiau</button>
     </div>
   `;
   document.getElementById("finishReadBtn").onclick = () => {
