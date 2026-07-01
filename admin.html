@@ -71,6 +71,7 @@ function renderResults(){
             <th>WPM</th>
             <th>Apklausos atsakymai</th>
             <th>Supratimo atsakymai</th>
+            <th>Paliko tabą</th>
           </tr>
         </thead>
         <tbody>
@@ -80,6 +81,9 @@ function renderResults(){
               <td>${r.wpm ?? "—"}</td>
               <td>${formatJson(r.survey_answers)}</td>
               <td>${formatJson(r.comprehension_answers)}</td>
+              <td style="${r.left_tab ? 'color:#b5502f;font-weight:bold;' : ''}">
+                ${r.left_tab ? `Taip (${r.left_tab_count}×)` : "Ne"}
+              </td>
             </tr>
           `).join("")}
         </tbody>
