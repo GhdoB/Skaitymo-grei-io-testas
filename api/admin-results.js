@@ -1,5 +1,4 @@
-// Vercel serverless funkcija. Naudoja SUPABASE_SERVICE_ROLE_KEY (aplinkos kintamasis,
-// niekada nerodomas naršyklėje), tad gali skaityti visus įrašus, apeidama RLS.
+// Vercel serverless funkcija. Naudoja SUPABASE_SERVICE_ROLE_KEY, gali skaityti visus įrašus, apeidama RLS.
 // Prieiga apsaugota slaptažodžiu (ADMIN_PASSWORD aplinkos kintamasis).
 
 const { createClient } = require("@supabase/supabase-js");
