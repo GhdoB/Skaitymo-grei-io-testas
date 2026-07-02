@@ -24,14 +24,6 @@ button{
   border:none; padding:10px 20px; border-radius:2px; cursor:pointer;
 }
 button:hover{background:var(--accent);}
-.delete-btn{
-  background:transparent;
-  color:var(--accent);
-  border:1px solid var(--accent);
-  padding:6px 12px;
-  font-size:11px;
-}
-.delete-btn:hover{background:var(--accent); color:var(--paper);}
 .toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
 table{width:100%; border-collapse:collapse; font-size:12px; background:var(--card);}
 th, td{border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top;}
@@ -41,3 +33,14 @@ th{background:var(--accent); color:var(--paper); position:sticky; top:0;}
 .stat{background:var(--card); border:1px solid var(--line); padding:12px 16px; border-radius:4px;}
 .stat b{display:block; font-size:20px;}
  
+.delete-btn{
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 6px 12px;
+  font-size: 11px;
+}
+.delete-btn:hover{
+  background: var(--accent);
+  color: #fff;
+}
