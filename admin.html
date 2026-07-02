@@ -33,7 +33,9 @@ function renderLogin(errorMsg){
 async function login(password){
   root.innerHTML = `<div class="login-box"><p>Kraunama...</p></div>`;
   try{
-    const res = await fetch(`/api/admin-results?password=${encodeURIComponent(password)}`);
+    const res = await fetch(`/api/admin-results`, {
+  headers: { "x-admin-password": password }
+});
     const data = await res.json();
     if(!res.ok){
       renderLogin(data.error || "Klaida.");
