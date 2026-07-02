@@ -57,9 +57,9 @@ Komunikacijai su Marsu palaikyti galimi du formatai – radijo bangomis veikiant
 
 // Supratimo klausimai po skaitymo testo
 const COMPREHENSION_QUESTIONS = [
-  { id: "c1", text: "ČIA SUPRATIMO KLAUSIMAS 1", type: "text" },
-  { id: "c2", text: "ČIA SUPRATIMO KLAUSIMAS 2", type: "choice", options: ["ČIA VARIANTAS A", "ČIA VARIANTAS B", "ČIA VARIANTAS C"] },
-  { id: "c3", text: "ČIA SUPRATIMO KLAUSIMAS 3", type: "text" }
+  { id: "c1", text: "KLAUSIMAS 1", type: "text" },
+  { id: "c2", text: "KLAUSIMAS 2", type: "choice", options: ["VARIANTAS A", "VARIANTAS B", "VARIANTAS C"] },
+  { id: "c3", text: "KLAUSIMAS 3", type: "text" }
 ];
 
 /* ============================================================
@@ -321,8 +321,7 @@ function renderReading(){
 function renderComprehension(){
   const allAnswered = COMPREHENSION_QUESTIONS.every(q => state.compAnswers[q.id]);
   card.innerHTML = `
-    <p class="eyebrow">Supratimo klausimai</p>
-    <h1>Atsakyk trumpai</h1>
+    <h1>KLAUSIMAI</h1>
     ${COMPREHENSION_QUESTIONS.map(q => {
       if(q.type === "choice"){
         return `<div class="comp-question">
