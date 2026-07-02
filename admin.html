@@ -33,7 +33,11 @@ function renderLogin(errorMsg){
 async function login(password){
   root.innerHTML = `<div class="login-box"><p>Kraunama...</p></div>`;
   try{
-    const res = await fetch(`/api/admin-results?password=${encodeURIComponent(password)}`);
+    // Slaptažodis siunčiamas per header, o ne URL parametrą — taip jis
+    // nepatenka į serverio/naršyklės žurnalus ar naršymo istoriją.
+    const res = await fetch(`/api/admin-results`, {
+      headers: { "x-admin-password": password }
+    });
     const data = await res.json();
     if(!res.ok){
       renderLogin(data.error || "Klaida.");
@@ -71,6 +75,7 @@ function renderResults(){
             <th>WPM</th>
             <th>Apklausos atsakymai</th>
             <th>Supratimo atsakymai</th>
+            <th>Paliko tabą</th>
             <th>Veiksmai</th>
           </tr>
         </thead>
@@ -81,6 +86,9 @@ function renderResults(){
               <td>${r.wpm ?? "—"}</td>
               <td>${formatJson(r.survey_answers)}</td>
               <td>${formatJson(r.comprehension_answers)}</td>
+              <td style="${r.left_tab ? 'color:#b5502f;font-weight:bold;' : ''}">
+                ${r.left_tab ? `Taip (${r.left_tab_count ?? 0}×)` : "Ne"}
+              </td>
               <td><button class="delete-btn" data-id="${r.id}">Ištrinti</button></td>
             </tr>
           `).join("")}
@@ -122,13 +130,15 @@ function formatJson(obj){
 function exportCsv(){
   const keysSurvey = [...new Set(allResults.flatMap(r => Object.keys(r.survey_answers || {})))];
   const keysComp = [...new Set(allResults.flatMap(r => Object.keys(r.comprehension_answers || {})))];
-  const header = ["created_at", "wpm", ...keysSurvey, ...keysComp.map(k => "comp_" + k)];
+  const header = ["created_at", "wpm", ...keysSurvey, ...keysComp.map(k => "comp_" + k), "left_tab", "left_tab_count"];
   const rows = allResults.map(r => {
     const row = [
       r.created_at,
       r.wpm ?? "",
       ...keysSurvey.map(k => csvSafe((r.survey_answers || {})[k])),
-      ...keysComp.map(k => csvSafe((r.comprehension_answers || {})[k]))
+      ...keysComp.map(k => csvSafe((r.comprehension_answers || {})[k])),
+      r.left_tab ? "taip" : "ne",
+      r.left_tab_count ?? 0
     ];
     return row.join(",");
   });
