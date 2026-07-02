@@ -33,9 +33,7 @@ function renderLogin(errorMsg){
 async function login(password){
   root.innerHTML = `<div class="login-box"><p>Kraunama...</p></div>`;
   try{
-    const res = await fetch(`/api/admin-results`, {
-  headers: { "x-admin-password": password }
-});
+    const res = await fetch(`/api/admin-results?password=${encodeURIComponent(password)}`);
     const data = await res.json();
     if(!res.ok){
       renderLogin(data.error || "Klaida.");
@@ -73,7 +71,7 @@ function renderResults(){
             <th>WPM</th>
             <th>Apklausos atsakymai</th>
             <th>Supratimo atsakymai</th>
-            <th>Išėjo iš puslapio</th>
+            <th>Veiksmai</th>
           </tr>
         </thead>
         <tbody>
@@ -83,9 +81,7 @@ function renderResults(){
               <td>${r.wpm ?? "—"}</td>
               <td>${formatJson(r.survey_answers)}</td>
               <td>${formatJson(r.comprehension_answers)}</td>
-              <td style="${r.left_tab ? 'color:#b5502f;font-weight:bold;' : ''}">
-                ${r.left_tab ? `Taip (${r.left_tab_count}×)` : "Ne"}
-              </td>
+              <td><button class="delete-btn" data-id="${r.id}">Ištrinti</button></td>
             </tr>
           `).join("")}
         </tbody>
@@ -93,6 +89,29 @@ function renderResults(){
     </div>
   `;
   document.getElementById("exportBtn").onclick = exportCsv;
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.onclick = () => deleteResult(btn.dataset.id);
+  });
+}
+
+async function deleteResult(id){
+  if(!confirm("Ar tikrai nori negrįžtamai ištrinti šį įrašą?")) return;
+  const password = sessionStorage.getItem("admin_pw");
+  try{
+    const res = await fetch(`/api/admin-results?id=${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      headers: { "x-admin-password": password }
+    });
+    const data = await res.json();
+    if(!res.ok){
+      alert(data.error || "Nepavyko ištrinti įrašo.");
+      return;
+    }
+    allResults = allResults.filter(r => r.id !== id);
+    renderResults();
+  } catch(e){
+    alert("Nepavyko prisijungti prie serverio.");
+  }
 }
 
 function formatJson(obj){
