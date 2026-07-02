@@ -4,7 +4,7 @@
 const { createClient } = require("@supabase/supabase-js");
 
 module.exports = async (req, res) => {
-  const password = req.query.password || req.headers["x-admin-password"];
+  const password = req.headers["x-admin-password"];
 
   if (!password || password !== process.env.ADMIN_PASSWORD) {
     res.status(401).json({ error: "Neteisingas slaptažodis." });
