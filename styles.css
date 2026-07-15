@@ -38,6 +38,14 @@ body{
   color:var(--accent);
   margin:0 0 12px;
 }
+.optional-tag{
+  font-family:'Helvetica', 'sans-serif';
+  font-size:11px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin:0 0 8px;
+}
 h1{
   font-size:30px;
   font-weight:600;
@@ -145,6 +153,83 @@ textarea{min-height:90px;resize:vertical;}
   margin-bottom:8px;
 }
 .error-msg{color:var(--accent);font-size:13px;margin-top:8px;}
+.option.disabled-opt{
+  opacity:.35;
+  cursor:not-allowed;
+  pointer-events:none;
+}
+.slider-wrap{
+  position:relative;
+  padding-top:40px;
+  margin-bottom:8px;
+}
+input[type=range]{
+  -webkit-appearance:none;
+  appearance:none;
+  width:100%;
+  height:4px;
+  background:var(--line);
+  border-radius:2px;
+  outline:none;
+  margin:0;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:var(--accent);
+  border:3px solid var(--card);
+  box-shadow:0 1px 3px rgba(43,38,32,0.3);
+  cursor:pointer;
+}
+input[type=range]::-moz-range-thumb{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:var(--accent);
+  border:3px solid var(--card);
+  box-shadow:0 1px 3px rgba(43,38,32,0.3);
+  cursor:pointer;
+}
+input[type=range]::-moz-range-track{
+  height:4px;
+  background:var(--line);
+  border-radius:2px;
+}
+.slider-bubble{
+  position:absolute;
+  top:0;
+  transform:translateX(-50%);
+  background:var(--ink);
+  color:var(--paper);
+  font-family:'Helvetica','sans-serif';
+  font-size:13px;
+  font-weight:600;
+  padding:4px 10px;
+  border-radius:4px;
+  pointer-events:none;
+  white-space:nowrap;
+}
+.slider-bubble::after{
+  content:"";
+  position:absolute;
+  bottom:-5px;
+  left:50%;
+  transform:translateX(-50%);
+  border-width:5px 5px 0 5px;
+  border-style:solid;
+  border-color:var(--ink) transparent transparent transparent;
+}
+.slider-labels{
+  display:flex;
+  justify-content:space-between;
+  font-family:'Helvetica','sans-serif';
+  font-size:12px;
+  color:var(--ink-soft);
+  margin-top:10px;
+}
 footer{
   text-align:center;
   font-family:'Helvetica', 'sans-serif';
