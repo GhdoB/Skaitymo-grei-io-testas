@@ -28,9 +28,15 @@ const SURVEY_QUESTIONS = [
   { id: "q1", text: "Jūsų amžius", type: "select", options: ["10","11","12","13","14","15","16","17","18","19",
     "20","21","22","23","24","25","26","27","28","29",
     "30","31","32","33","34","35","36","37","38","39","40"] },
-  { id: "q2", text: "Jūsų lytis", type: "choice", options: ["Vyras", "Moteris"] },
-  { id: "q3", text: "Kiek laiko per dieną praleidžiate skaitydami ?", type: "choice", options: ["Mažiau nei 30 min.", "30 – 60 min", "1 - 2 valandos", "2 - 3 valandos", "Daugiau nei 3 valandos"] },
-  { id: "q4", text: "Kokiu formatu dažniausiai skaitote ?", type: "choice", options: ["Popierinės knygos", "E - knygos (PDF, „Kindle“ ir pan.)", "Straipsniai internete", "Socialinių tinklų įrašai", "Subtitrai", "Kita"] },
+  { id: "q2", text: "Jūsų lytis", type: "choice", options: ["Vyras", "Moteris", "Nenoriu nurodyti"] },
+  { id: "q3", text: "Aukščiausias baigtas arba šiuo metu siekiamas išsilavinimas", type: "choice", options: ["Šiuo metu mokausi mokykloje", "Vidurinis", "Profesinis", "Aukštesnysis", "Aukštasis (bakalauro)", "Aukštasis (magistro)", "Aukštasis (daktaro)"]},
+  { id: "q4", text: "Gimtoji kalba (įrašyti)", type: "text" },
+  { id: "q5", text: "Ar turite regėjimo ar skaitymo sutrikimų, kurie gali turėti įtakos skaitymui? (Galima pasirinkti kelis variantus.)", type: "multiple", required: false, options: ["Ne", "Nešioju akinius", "Nešioju kontaktinius lęšius", "Turiu diagnozuotą disleksiją", "Kita (įrašyti)"]},
+  { id: "q6", text: "Kaip dažnai skaitote ilgesnius tekstus? (knygas, straipsnius, studijų medžiagą ir pan.)", type: "choice", options: ["Kasdien", "Kelis kartus per savaitę", "Kartą per savaitę", "Kelis kartus per mėnesį", "Retai", "Beveik niekada"]},
+  { id: "q7", text: "Kiek laiko vidutiniškai per dieną praleidžiate skaitydami tekstus skaitmeniniuose įrenginiuose?", type: "choice", options: ["Mažiau nei 30 min.", "30 – 60 min.", "1 – 2 val.", "2 – 4 val.", "Daugiau nei 4 val."]},
+  { id: "q8", text: " Kokiu formatu dažniausiai skaitote? (pasirinkite iki 3 dažniausių)", type: "multiple", maxSelect: 3, options: ["Spausdintas knygas", "Spausdintus studijų / darbo dokumentus", "Spausdintą spaudą (laikraščius, žurnalus)", "El. knygas", "El. studijų / darbo dokumentus", "El. laiškus", "Socialinių tinklų įrašus", "Žinutes susirašinėjimo programėlėse (pvz., Messenger, WhatsApp)", "Naujienų portalus", "Interneto tinklaraščius", "Interneto forumus (pvz., Reddit)", "Internetines enciklopedijas ar informacinius tinklalapius", "Kita (įrašyti)"]},
+  { id: "q9", text: "Kokiame įrenginyje dažniausiai skaitote?", type: "choice", options: ["Spausdintas tekstas", "Kompiuteris / nešiojamas kompiuteris", "Planšetė", "Išmanusis telefonas", "Elektroninė skaityklė (Kindle ir pan.)"]},
+  { id: "q10", text: "Kaip įvertintumėte savo skaitymo įgūdžius?(1 – labai lėtai, 5 – labai greitai)", type: "slider", options: ["1","2","3","4","5"]}
 ];
 
 // Skaitymo testo instrukcija
@@ -57,9 +63,11 @@ Komunikacijai su Marsu palaikyti galimi du formatai – radijo bangomis veikiant
 
 // Supratimo klausimai po skaitymo testo
 const COMPREHENSION_QUESTIONS = [
-  { id: "c1", text: "KLAUSIMAS 1", type: "text" },
-  { id: "c2", text: "KLAUSIMAS 2", type: "choice", options: ["VARIANTAS A", "VARIANTAS B", "VARIANTAS C"] },
-  { id: "c3", text: "KLAUSIMAS 3", type: "text" }
+  {id: "c1", text: "Kokią žmogaus gyvenimo dalį vidutiniškai sudaro miegas?", type: "choice", options: ["Pusę gyvenimo", "Trečdalį gyvenimo", "Ketvirtadalį gyvenimo", "Penktadalį gyvenimo"]},
+  {id: "c2", text: "Kiek vidutiniškai spanų žmogus susapnuoja per naktį ?", type: "choice", options: ["Du", "Tris", "Keturis", "Penkis"]},
+  {id: "c3", text: "Kuris teiginys apie miegą, remiantis tekstu, yra teisingas ?", type: "choice", options: ["Miegas yra tik rami organizmo būsena", "Miegas yra aktyvus biologinis procesas", "Miegas vyksta tik tada, kai smegenys ilsisi", "Tekste apie tai nebuvo kalbama"]},
+  {id: "c4", text: "Kokių gyvūnų REM miegą tyrė prancūzų neurologas Michelis Jouvet ?", type: "choice", options: ["Beždžionių", "Žiurkių", "Šunų", "Kačių"]},
+  {id: "c5", text: "Kas, remiantis tekste aptariamo 1942 m. tyrimo rezultatais, galėjo turėti įtakos tam, kad anuomet daugiau žmonių sapnuodavo nespalvotai ?", type: "choice", options: ["TXT"]}
 ];
 
 /* ============================================================
@@ -152,6 +160,31 @@ function renderLanding(){
   };
 }
 
+function isAnswered(q){
+  if (q.required === false) return true;
+  if (q.type === "multiple") {
+    const arr = state.surveyAnswers[q.id] || [];
+    if (arr.length === 0) return false;
+    const otherOpt = q.options.find(o => o.startsWith("Kita"));
+    if (otherOpt && arr.includes(otherOpt)) {
+      return !!(state.surveyAnswers[q.id + "_other"] || "").trim();
+    }
+    return true;
+  }
+  if (q.type === "choice") {
+    const val = state.surveyAnswers[q.id];
+    if (!val) return false;
+    if (val.startsWith("Kita")) {
+      return !!(state.surveyAnswers[q.id + "_other"] || "").trim();
+    }
+    return true;
+  }
+  if (q.type === "slider") {
+    return state.surveyAnswers[q.id] !== undefined && state.surveyAnswers[q.id] !== "";
+  }
+  return !!(state.surveyAnswers[q.id] || "").toString().trim();
+}
+
 function renderSurvey(){
   const q = SURVEY_QUESTIONS[state.surveyIndex];
   const total = SURVEY_QUESTIONS.length;
@@ -162,15 +195,39 @@ function renderSurvey(){
 
     inputHtml = `<div class="options">` + q.options.map((opt,i) => {
       const selected = state.surveyAnswers[q.id] === opt ? "selected" : "";
+      const isOther = opt.startsWith("Kita");
       return `
   <button class="option ${selected}" data-opt="${i}">${opt}</button>
   ${
-    opt === "Kita" && state.surveyAnswers[q.id] === "Kita"
+    isOther && state.surveyAnswers[q.id] === opt
       ? `<input
             type="text"
             id="otherAnswer"
             placeholder="Įrašykite..."
-            value="${state.surveyAnswers[q.id + "_other"] || ""}"
+            value="${(state.surveyAnswers[q.id + "_other"] || "").replace(/"/g,'&quot;')}"
+         >`
+      : ""
+  }
+`;
+    }).join("") + `</div>`;
+
+} else if (q.type === "multiple") {
+
+    const selectedArr = state.surveyAnswers[q.id] || [];
+    const limitReached = q.maxSelect && selectedArr.length >= q.maxSelect;
+    inputHtml = `<div class="options">` + q.options.map((opt,i) => {
+      const isOther = opt.startsWith("Kita");
+      const isSelected = selectedArr.includes(opt);
+      const disabledCls = (!isSelected && limitReached) ? "disabled-opt" : "";
+      return `
+  <button class="option ${isSelected ? "selected" : ""} ${disabledCls}" data-opt="${i}">${opt}</button>
+  ${
+    isOther && isSelected
+      ? `<input
+            type="text"
+            id="otherAnswer"
+            placeholder="Įrašykite..."
+            value="${(state.surveyAnswers[q.id + "_other"] || "").replace(/"/g,'&quot;')}"
          >`
       : ""
   }
@@ -190,23 +247,35 @@ function renderSurvey(){
       </select>
     `;
 
+} else if (q.type === "slider") {
+
+    const val = state.surveyAnswers[q.id] !== undefined ? state.surveyAnswers[q.id] : 3;
+    inputHtml = `
+      <div class="slider-wrap">
+        <div class="slider-bubble" id="sliderBubble">${val}</div>
+        <input type="range" id="sliderAnswer" min="1" max="5" step="1" value="${val}">
+        <div class="slider-labels">${q.options.map(o => `<span>${o}</span>`).join("")}</div>
+      </div>
+    `;
+
 } else {
 
     const val = state.surveyAnswers[q.id] || "";
     inputHtml = `<input type="text" id="textAnswer"
         value="${val.replace(/"/g,'&quot;')}"
-        placeholder="Įrašyk atsakymą">`;
+        placeholder="Įrašykite...">`;
 }
 
   card.innerHTML = `
     <div class="progress">Klausimas ${state.surveyIndex+1} / ${total}
       <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
     </div>
+    ${q.required === false ? `<p class="optional-tag">NEPRIVALOMAS KLAUSIMAS</p>` : ""}
     <div class="question-text">${q.text}</div>
     ${inputHtml}
     <div class="btn-row">
-      <button class="btn" id="nextBtn" ${!state.surveyAnswers[q.id] ? "disabled" : ""}>
-        ${state.surveyIndex === total-1 ? "Toliau" : "Toliau"}
+      <button class="btn" id="nextBtn" ${!isAnswered(q) ? "disabled" : ""}>
+        Toliau
       </button>
     </div>
   `;
@@ -217,27 +286,73 @@ function renderSurvey(){
         btn.onclick = () => {
             const selected = q.options[btn.dataset.opt];
             state.surveyAnswers[q.id] = selected;
+            if(!selected.startsWith("Kita")) delete state.surveyAnswers[q.id + "_other"];
             renderSurvey();
         };
-
-        const otherInput = document.getElementById("otherAnswer");
-
-if (otherInput) {
-    otherInput.oninput = () => {
-        state.surveyAnswers[q.id + "_other"] = otherInput.value;
-        document.getElementById("nextBtn").disabled = !otherInput.value.trim();
-    };
-
-    document.getElementById("nextBtn").disabled = !otherInput.value.trim();
-}
     });
+
+    const otherInput = document.getElementById("otherAnswer");
+    if (otherInput) {
+        otherInput.oninput = () => {
+            state.surveyAnswers[q.id + "_other"] = otherInput.value;
+            document.getElementById("nextBtn").disabled = !isAnswered(q);
+        };
+    }
+
+} else if (q.type === "multiple") {
+
+    document.querySelectorAll(".option").forEach(btn => {
+        btn.onclick = () => {
+            if (btn.classList.contains("disabled-opt")) return;
+            const opt = q.options[btn.dataset.opt];
+            let arr = state.surveyAnswers[q.id] ? [...state.surveyAnswers[q.id]] : [];
+            const idx = arr.indexOf(opt);
+            if (idx >= 0) {
+                arr.splice(idx, 1);
+                if (opt.startsWith("Kita")) delete state.surveyAnswers[q.id + "_other"];
+            } else {
+                if (q.maxSelect && arr.length >= q.maxSelect) return;
+                arr.push(opt);
+            }
+            state.surveyAnswers[q.id] = arr;
+            renderSurvey();
+        };
+    });
+
+    const otherInput = document.getElementById("otherAnswer");
+    if (otherInput) {
+        otherInput.oninput = () => {
+            state.surveyAnswers[q.id + "_other"] = otherInput.value;
+            document.getElementById("nextBtn").disabled = !isAnswered(q);
+        };
+    }
 
 } else if (q.type === "select") {
 
     const select = document.getElementById("selectAnswer");
     select.onchange = () => {
         state.surveyAnswers[q.id] = select.value;
-        document.getElementById("nextBtn").disabled = !select.value;
+        document.getElementById("nextBtn").disabled = !isAnswered(q);
+    };
+
+} else if (q.type === "slider") {
+
+    const slider = document.getElementById("sliderAnswer");
+    const bubble = document.getElementById("sliderBubble");
+    state.surveyAnswers[q.id] = +slider.value;
+
+    const updateBubble = () => {
+        const min = +slider.min, max = +slider.max, val = +slider.value;
+        const pctPos = (val - min) / (max - min);
+        bubble.style.left = `calc(${pctPos * 100}% + ${(0.5 - pctPos) * 22}px)`;
+        bubble.textContent = val;
+    };
+    updateBubble();
+
+    slider.oninput = () => {
+        state.surveyAnswers[q.id] = +slider.value;
+        updateBubble();
+        document.getElementById("nextBtn").disabled = !isAnswered(q);
     };
 
 } else {
@@ -245,17 +360,12 @@ if (otherInput) {
     const input = document.getElementById("textAnswer");
     input.oninput = () => {
         state.surveyAnswers[q.id] = input.value;
-        document.getElementById("nextBtn").disabled = !input.value.trim();
+        document.getElementById("nextBtn").disabled = !isAnswered(q);
     };
 }
 
   document.getElementById("nextBtn").onclick = () => {
-    if (state.surveyAnswers[q.id] === "Kita") {
-    if (!state.surveyAnswers[q.id + "_other"]?.trim()) return;
-}
-else if (!state.surveyAnswers[q.id]) {
-    return;
-}
+    if (!isAnswered(q)) return;
     if(state.surveyIndex < total - 1){
       state.surveyIndex++;
       renderSurvey();
