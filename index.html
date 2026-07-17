@@ -34,11 +34,11 @@ const SURVEY_QUESTIONS = [
   { id: "q2", text: "Jūsų lytis", type: "choice", options: ["Vyras", "Moteris", "Nenoriu nurodyti"] },
   { id: "q3", text: "Aukščiausias baigtas arba šiuo metu siekiamas išsilavinimas", type: "choice", options: ["Šiuo metu mokausi mokykloje", "Vidurinis", "Profesinis", "Aukštesnysis", "Aukštasis (bakalauro)", "Aukštasis (magistro)", "Aukštasis (daktaro)"]},
   { id: "q4", text: "Gimtoji kalba (įrašyti)", type: "text" },
-  { id: "q5", text: "Ar turite regėjimo ar skaitymo sutrikimų, kurie gali turėti įtakos skaitymui? (Galima pasirinkti kelis variantus.)", type: "multiple", required: false, options: ["Ne", "Nešioju akinius", "Nešioju kontaktinius lęšius", "Turiu diagnozuotą disleksiją", "Kita (įrašyti)"]},
-  { id: "q6", text: "Kaip dažnai skaitote ilgesnius tekstus? (knygas, straipsnius, studijų medžiagą ir pan.)", type: "choice", options: ["Kasdien", "Kelis kartus per savaitę", "Kartą per savaitę", "Kelis kartus per mėnesį", "Retai", "Beveik niekada"]},
+  { id: "q5", text: "Ar turite regėjimo ar skaitymo sutrikimų, kurie gali turėti įtakos skaitymui ? (Galima pasirinkti kelis variantus.)", type: "multiple", required: false, options: ["Ne", "Nešioju akinius", "Nešioju kontaktinius lęšius", "Turiu diagnozuotą disleksiją", "Kita (įrašyti)"]},
+  { id: "q6", text: "Kaip dažnai skaitote ilgesnius tekstus ? (knygas, straipsnius, studijų medžiagą ir pan.)", type: "choice", options: ["Kasdien", "Kelis kartus per savaitę", "Kartą per savaitę", "Kelis kartus per mėnesį", "Retai", "Beveik niekada"]},
   { id: "q7", text: "Kiek laiko vidutiniškai per dieną praleidžiate skaitydami tekstus skaitmeniniuose įrenginiuose?", type: "choice", options: ["Mažiau nei 30 min.", "30 – 60 min.", "1 – 2 val.", "2 – 4 val.", "Daugiau nei 4 val."]},
-  { id: "q8", text: " Kokiu formatu dažniausiai skaitote? (pasirinkite iki 3 dažniausių)", type: "multiple", maxSelect: 3, options: ["Spausdintas knygas", "Spausdintus studijų / darbo dokumentus", "Spausdintą spaudą (laikraščius, žurnalus)", "El. knygas", "El. studijų / darbo dokumentus", "El. laiškus", "Socialinių tinklų įrašus", "Žinutes susirašinėjimo programėlėse (pvz., Messenger, WhatsApp)", "Naujienų portalus", "Interneto tinklaraščius", "Interneto forumus (pvz., Reddit)", "Internetines enciklopedijas ar informacinius tinklalapius", "Kita (įrašyti)"]},
-  { id: "q9", text: "Kokiame įrenginyje dažniausiai skaitote?", type: "choice", options: ["Spausdintas tekstas", "Kompiuteris / nešiojamas kompiuteris", "Planšetė", "Išmanusis telefonas", "Elektroninė skaityklė (Kindle ir pan.)"]},
+  { id: "q8", text: " Kokiu formatu dažniausiai skaitote ? (pasirinkite iki 3 dažniausių)", type: "multiple", maxSelect: 3, options: ["Spausdintas knygas", "Spausdintus studijų / darbo dokumentus", "Spausdintą spaudą (laikraščius, žurnalus)", "El. knygas", "El. studijų / darbo dokumentus", "El. laiškus", "Socialinių tinklų įrašus", "Žinutes susirašinėjimo programėlėse (pvz., Messenger, WhatsApp)", "Naujienų portalus", "Interneto tinklaraščius", "Interneto forumus (pvz., Reddit)", "Internetines enciklopedijas ar informacinius tinklalapius", "Kita (įrašyti)"]},
+  { id: "q9", text: "Kokiame įrenginyje dažniausiai skaitote ?", type: "choice", options: ["Spausdintas tekstas", "Kompiuteris / nešiojamas kompiuteris", "Planšetė", "Išmanusis telefonas", "Elektroninė skaityklė (Kindle ir pan.)"]},
   { id: "q10", text: "Kaip įvertintumėte savo skaitymo įgūdžius?(1 – labai lėtai, 5 – labai greitai)", type: "slider", options: ["1","2","3","4","5"]}
 ];
 
@@ -66,9 +66,11 @@ Nors yra žmonių, teigiančių, kad jie nesapnuoja, vis dėlto tikėtina, kad s
 
 // Supratimo klausimai po skaitymo testo
 const COMPREHENSION_QUESTIONS = [
-  { id: "c1", text: "KLAUSIMAS 1", type: "text" },
-  { id: "c2", text: "KLAUSIMAS 2", type: "choice", options: ["VARIANTAS A", "VARIANTAS B", "VARIANTAS C"] },
-  { id: "c3", text: "KLAUSIMAS 3", type: "text" }
+  {id: "c1", text: "Kokią žmogaus gyvenimo dalį vidutiniškai sudaro miegas ?", type: "choice", options: ["Pusę gyvenimo", "Trečdalį gyvenimo", "Ketvirtadalį gyvenimo", "Penktadalį gyvenimo"]},
+  {id: "c2", text: "Kiek vidutiniškai spanų žmogus susapnuoja per naktį ?", type: "choice", options: ["Du", "Tris", "Keturis", "Penkis"]},
+  {id: "c3", text: "Kuris teiginys apie miegą, remiantis tekstu, yra teisingas ?", type: "choice", options: ["Miegas yra tik rami organizmo būsena", "Miegas yra aktyvus biologinis procesas", "Miegas vyksta tik tada, kai smegenys ilsisi", "Tekste apie tai nebuvo kalbama"]},
+  {id: "c4", text: "Kokių gyvūnų REM miegą tyrė prancūzų neurologas Michelis Jouvet ?", type: "choice", options: ["Beždžionių", "Žiurkių", "Šunų", "Kačių"]},
+  {id: "c5", text: "Kas, remiantis tekste aptariamo 1942 m. tyrimo rezultatais, galėjo turėti įtakos tam, kad anuomet daugiau žmonių sapnuodavo nespalvotai ?", type: "text"}
 ];
 
 /* ============================================================
