@@ -43,7 +43,7 @@ const SURVEY_QUESTIONS = [
 ];
 
 // Skaitymo testo instrukcija
-const TEST_INSTRUCTIONS = "Kai būsite pasiruošę, spustelkite „Pradėti“. Tekstą skaitykite įprastu greičiu. Baigę, spustelkite „Perskaičiau“.";
+const TEST_INSTRUCTIONS = "Kai būsite pasiruošę, spustelėkite „Pradėti“. Tekstą skaitykite įprastu greičiu. Baigę, spustelėkite „Perskaičiau“.";
 
 // Skaitymo teksto pavadinimas (rodomas per centrą virš teksto)
 const READING_TITLE = "Kas lemia, kad mūsų sapnai spalvoti ir kodėl kai kurie žmonės jų neprisimena";
@@ -491,6 +491,7 @@ function renderDone(){
   card.innerHTML = `
     <h1>Ačiū!</h1>
     <p>Atsakymai išsaugoti anonimiškai. Testas baigtas.</p>
+    <p>Jūsų skaitymo greitis: <strong>${state.wpm ?? "—"} WPM</strong></p>
   `;
 }
 
