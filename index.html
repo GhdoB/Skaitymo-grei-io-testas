@@ -79,6 +79,18 @@ const COMPREHENSION_QUESTIONS = [
 
 const card = document.getElementById("card");
 
+// Aptinka, ar testas atliekamas iš telefono, planšetės ar kompiuterio,
+// remiantis naršyklės userAgent duomenimis.
+function detectDeviceType(){
+  const ua = navigator.userAgent || "";
+  const isTablet = /iPad|Tablet|PlayBook|Kindle|Silk/i.test(ua) ||
+    (/Android/i.test(ua) && !/Mobile/i.test(ua));
+  const isMobile = /Mobi|iPhone|iPod|Android.*Mobile|Windows Phone|BlackBerry/i.test(ua);
+  if(isTablet) return "Planšetė";
+  if(isMobile) return "Mobilus telefonas";
+  return "Kompiuteris";
+}
+
 // Apsauginis tikrinimas: jei config.js arba Supabase biblioteka
 // neužsikrovė, parodom aiškią klaidą vietoj tuščio puslapio.
 let supabaseClient;
@@ -514,7 +526,8 @@ async function submitResults(){
     wpm: state.wpm,
     comprehension_answers: state.compAnswers,
     left_tab: state.leftTab,
-    left_tab_count: state.leftTabCount
+    left_tab_count: state.leftTabCount,
+    device_type: detectDeviceType()
   });
   if(error){
     console.error(error);
