@@ -14,6 +14,34 @@
 const root = document.getElementById("root");
 let allResults = [];
 
+// Teisingi atsakymai klausimams c1–c4 (pasirenkami, tikrinami automatiškai).
+// c5 yra laisvo teksto klausimas, todėl jį adminas įvertina rankiniu būdu.
+const CORRECT_ANSWERS = {
+  c1: "Trečdalį gyvenimo",
+  c2: "Penkis",
+  c3: "Miegas yra aktyvus biologinis procesas",
+  c4: "Kačių"
+};
+
+// Įrašų id, kurių c5 vertinimas šiuo metu redaguojamas (rodomi mygtukai,
+// o ne jau apskaičiuotas rezultatas).
+const editingC5 = new Set();
+
+function countAutoCorrect(answers){
+  answers = answers || {};
+  let correct = 0;
+  for(const qid of Object.keys(CORRECT_ANSWERS)){
+    if(answers[qid] === CORRECT_ANSWERS[qid]) correct++;
+  }
+  return correct;
+}
+
+function comprehensionScore(r){
+  const autoCorrect = countAutoCorrect(r.comprehension_answers);
+  const total = autoCorrect + (r.c5_correct === true ? 1 : 0);
+  return { correct: total, percent: Math.round((total / 5) * 100) };
+}
+
 function renderLogin(errorMsg){
   root.innerHTML = `
     <div class="login-box">
@@ -75,6 +103,7 @@ function renderResults(){
             <th>WPM</th>
             <th>Apklausos atsakymai</th>
             <th>Supratimo atsakymai</th>
+            <th>5 kl. / Rezultatas</th>
             <th>Paliko tabą</th>
             <th>Veiksmai</th>
           </tr>
@@ -86,6 +115,7 @@ function renderResults(){
               <td>${r.wpm ?? "—"}</td>
               <td>${formatJson(r.survey_answers)}</td>
               <td>${formatJson(r.comprehension_answers)}</td>
+              <td>${renderC5Cell(r)}</td>
               <td style="${r.left_tab ? 'color:#b5502f;font-weight:bold;' : ''}">
                 ${r.left_tab ? `Taip (${r.left_tab_count ?? 0}×)` : "Ne"}
               </td>
@@ -100,6 +130,62 @@ function renderResults(){
   document.querySelectorAll(".delete-btn").forEach(btn => {
     btn.onclick = () => deleteResult(btn.dataset.id);
   });
+  document.querySelectorAll(".grade-btn").forEach(btn => {
+    btn.onclick = () => gradeC5(btn.dataset.id, btn.dataset.correct === "true");
+  });
+  document.querySelectorAll(".regrade-btn").forEach(btn => {
+    btn.onclick = () => {
+      editingC5.add(btn.dataset.id);
+      renderResults();
+    };
+  });
+}
+
+function renderC5Cell(r){
+  const c5Answer = (r.comprehension_answers || {}).c5 || "—";
+  const needsGrading = r.c5_correct === null || r.c5_correct === undefined || editingC5.has(r.id);
+
+  if(needsGrading){
+    return `
+      <div class="c5-answer">${c5Answer}</div>
+      <div class="grade-btns">
+        <button class="grade-btn grade-correct" data-id="${r.id}" data-correct="true">✓ Teisingai</button>
+        <button class="grade-btn grade-incorrect" data-id="${r.id}" data-correct="false">✗ Neteisingai</button>
+      </div>
+    `;
+  }
+
+  const { correct, percent } = comprehensionScore(r);
+  return `
+    <div class="score-badge"><b>${percent}%</b> (${correct}/5)</div>
+    <div class="score-note">${r.c5_correct ? "5 kl. ✓" : "5 kl. ✗"}</div>
+    <button class="regrade-btn" data-id="${r.id}">Keisti</button>
+  `;
+}
+
+async function gradeC5(id, isCorrect){
+  const password = sessionStorage.getItem("admin_pw");
+  try{
+    const res = await fetch(`/api/admin-results`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-password": password
+      },
+      body: JSON.stringify({ id, c5_correct: isCorrect })
+    });
+    const data = await res.json();
+    if(!res.ok){
+      alert(data.error || "Nepavyko išsaugoti vertinimo.");
+      return;
+    }
+    const target = allResults.find(r => r.id === id);
+    if(target) target.c5_correct = isCorrect;
+    editingC5.delete(id);
+    renderResults();
+  } catch(e){
+    alert("Nepavyko prisijungti prie serverio.");
+  }
 }
 
 async function deleteResult(id){
@@ -130,13 +216,17 @@ function formatJson(obj){
 function exportCsv(){
   const keysSurvey = [...new Set(allResults.flatMap(r => Object.keys(r.survey_answers || {})))];
   const keysComp = [...new Set(allResults.flatMap(r => Object.keys(r.comprehension_answers || {})))];
-  const header = ["created_at", "wpm", ...keysSurvey, ...keysComp.map(k => "comp_" + k), "left_tab", "left_tab_count"];
+  const header = ["created_at", "wpm", ...keysSurvey, ...keysComp.map(k => "comp_" + k), "c5_teisingai", "supratimo_proc", "left_tab", "left_tab_count"];
   const rows = allResults.map(r => {
+    const { percent } = comprehensionScore(r);
+    const c5Status = r.c5_correct === true ? "taip" : r.c5_correct === false ? "ne" : "nepatikrinta";
     const row = [
       r.created_at,
       r.wpm ?? "",
       ...keysSurvey.map(k => csvSafe((r.survey_answers || {})[k])),
       ...keysComp.map(k => csvSafe((r.comprehension_answers || {})[k])),
+      c5Status,
+      (r.c5_correct === null || r.c5_correct === undefined) ? "" : percent,
       r.left_tab ? "taip" : "ne",
       r.left_tab_count ?? 0
     ];
