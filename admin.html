@@ -65,7 +65,8 @@ function renderLogin(errorMsg){
 async function login(password){
   root.innerHTML = `<div class="login-box"><p>Kraunama...</p></div>`;
   try{
-    // Slaptažodis siunčiamas per header, o ne URL parametrą 
+    // Slaptažodis siunčiamas per header, o ne URL parametrą
+    const res = await fetch(`/api/admin-results`, {
       headers: { "x-admin-password": password }
     });
     const data = await res.json();
@@ -80,6 +81,7 @@ async function login(password){
     renderLogin("Nepavyko prisijungti prie serverio.");
   }
 }
+
 
 function renderResults(){
   const wpmValues = allResults.map(r => r.wpm).filter(v => v != null);
