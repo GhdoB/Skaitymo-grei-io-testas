@@ -400,17 +400,13 @@ function renderInstructions(){
 
 function renderReading(){
   startTabTracking();
-  const paragraphsHtml = READING_TEXT
-    .split(/\n\s*\n/)
-    .map(p => `<p>${p.trim()}</p>`)
-    .join("");
 
   card.innerHTML = `
     <div class="timer-badge">Skaitymas vyksta</div>
 
     <div class="reading-text" id="readingText">
       <h2 class="reading-title">${READING_TITLE}</h2>
-      ${paragraphsHtml}
+      ${READING_TEXT}
     </div>
 
     <div class="btn-row">
