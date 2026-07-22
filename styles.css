@@ -61,6 +61,7 @@ p{
 .lead-p{
   margin:0;
   text-indent:28px;
+  text-align:justify;
 }
 .btn{
   font-family:'Helvetica', 'sans-serif';
