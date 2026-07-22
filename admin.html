@@ -15,7 +15,7 @@ const root = document.getElementById("root");
 let allResults = [];
 
 // Teisingi atsakymai klausimams c1–c4 (pasirenkami, tikrinami automatiškai).
-// c5 yra laisvo teksto klausimas, todėl jį adminas įvertina rankiniu būdu.
+// c5 adminas įvertina rankiniu būdu.
 const CORRECT_ANSWERS = {
   c1: "Trečdalį gyvenimo",
   c2: "Penkis",
@@ -27,11 +27,15 @@ const CORRECT_ANSWERS = {
 // o ne jau apskaičiuotas rezultatas).
 const editingC5 = new Set();
 
+function normalizeAnswer(s){
+  return (s ?? "").toString().normalize("NFC").trim();
+}
+
 function countAutoCorrect(answers){
   answers = answers || {};
   let correct = 0;
   for(const qid of Object.keys(CORRECT_ANSWERS)){
-    if(answers[qid] === CORRECT_ANSWERS[qid]) correct++;
+    if(normalizeAnswer(answers[qid]) === normalizeAnswer(CORRECT_ANSWERS[qid])) correct++;
   }
   return correct;
 }
@@ -61,8 +65,7 @@ function renderLogin(errorMsg){
 async function login(password){
   root.innerHTML = `<div class="login-box"><p>Kraunama...</p></div>`;
   try{
-    // Slaptažodis siunčiamas per header, o ne URL parametrą — taip jis
-    // nepatenka į serverio/naršyklės žurnalus ar naršymo istoriją.
+    // Slaptažodis siunčiamas per header, o ne URL parametrą
     const res = await fetch(`/api/admin-results`, {
       headers: { "x-admin-password": password }
     });
