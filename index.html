@@ -50,11 +50,17 @@ const READING_TITLE = "Kas lemia, kad mūsų sapnai spalvoti ir kodėl kai kurie
 
 // Skaitymo tekstas (WPM skaičiuojamas iš žodžių šiame tekste)
 const READING_TEXT = `Savo paslaptingumu sapnai žmoniją domina nuo senų laikų. Sapnus buvo bandoma iškoduoti kaip paslėptas žinutes – dažnai su pranašišku turiniu, kaip tam tikrą užuominą to, kas žmogaus laukia ateityje. Senovės graikai manė, kad nakties vaizdiniai yra dievų siunčiamos žinutės žmonėms, o jas aiškindavo dievų pranašais vadinami orakulai. Lietuvos kunigaikštis Gediminas, pasak legendos, susapnavo pranašišką sapną, dėl kurio iškilo Vilniaus miestas. Šiais laikais sapnų tyrimais užsiima mokslininkai. Jie vis dar bando išsiaiškinti, kaip atsiranda nakties vaizdiniai, kokia jų pagrindinė funkcija, kaip juos valdyti ir interpretuoti.
+
 Visi žinome, kad miegas užima reikšmingą mūsų gyvenimo dalį – apie trečdalį viso gyvenimo mes pramiegame. Nors miegą suprantame kaip sąlyginai ramią mūsų organizmo būseną, kai atsijungę nuo išorinio pasaulio mūsų kūnas ir smegenys ilsisi, leisdami vykti įvairiems atkuriamiesiems organizmo procesams ar įgytų patirčių įtvirtinimui į atminties schemas, ne visas miegas yra išties ramus.
+
 Reguliariais intervalais, kas valandą ar pusantros, mūsų smegenys tampa itin aktyvios, kvėpavimo ritmas suintensyvėja ir širdis pradeda plakti kur kas neritmiškiau. Nors kūnas išlieka nejudrus, mūsų užmerktos akys pradeda greitai judėti. Šios greitų akių judesių (angliškai REM) miego fazės metu mes pasineriame į sapnų pasaulį, atrodantį labai panašiai kaip ir mūsų realybė pabudus. Po jį mes keliaujame su savo sapno kūnu, sąveikaujame su kitais personažais, bandome įgyvendinti savo planus, išspręsti tam tikras problemas. Dažnai mus užplūsta stiprios emocijos, neretai jaučiame frustraciją. Visi mūsų pojūčiai tikroviški, sapne mes elgiamės ir į situacijas reaguojame taip, lyg viskas vyktų iš tiesų, ir dažniausiai tik pabudę susivokiame, kad visa tai tebuvo sapnas, vykęs mūsų vidinėje realybėje, ne išoriniame pasaulyje.
+
 Per naktį galime susapnuoti apie penketą sapnų, jie dažniausiai būna spalvoti. Didžioji dauguma žmonių sapnuoja spalvotai, o visai nesapnuojančių spalvotai yra tik 4 proc. Kodėl šiais laikais beveik visada regime spalvotus sapnus, atsakė 1942 m. atliktas tyrimas. Jo duomenimis, nesapnuojančių spalvotai buvo itin daug – 40 proc. Manoma, kad šiems rezultatams įtakos turėjo nespalvotos televizijos žiūrėjimas – jos nebelikus, beveik nebeliko ir nespalvotų sapnų.
+
 Psichologijos klasikas Sigmundas Freudas sapnus laikė karališku keliu į pasąmonės pažinimą. Vis dėlto turbūt didžiausią postūmį sapnų mokslo raidai suteikė XX a. šeštojo  dešimtmečio pradžioje atrastas reguliariai pasikartojantis REM miegas ir jo glaudžios sąsajos su sapnais – pirmuosiuose eksperimentuose 80 proc. dalyvių, miego laboratorijoje pažadintų iš REM miego, pranešdavo ryškiai sapnavę, tuo tarpu tarp pažadintų iš kito – ne REM miego būdavo vos keletas procentų.
+
 REM miegas buvo stebėtas ne tik tarp žmonių, bet ir tarp gyvūnų – žinduolių, paukščių. Prancūzų neurologas Michelis Jouvet atrado, kad katės REM miego metu ima elgtis tarytum pabudusios – pradeda judėti, vaikščioti, gaudyti grobį, žaisti, praustis, bet visa tai daro užmerktomis akimis ir visiškai nereaguodamos į aplinką. Iš pirmo žvilgsnio tai galėtų atrodyti kaip neginčijamas įrodymas, kad katės, o kartu ir kiti gyvūnai, REM miego metu sapnuoja lygiai taip pat kaip ir žmonės, bet vis dėlto tai nėra taip akivaizdu, nes sapnavimas visų pirma yra subjektyvi patirtis ir vienintelis būdas sužinoti, ar kas nors sapnavo, yra paklausti. Tad mes nežinome, ar gyvūnai ir labai maži vaikai (REM miegas prasideda dar vaisiui esant gimdoje) sapnuoja, nes neturime galimybės jų paklausti apie jų subjektyvias patirtis miego metu. Kai kurių autorių teigimu, gyvūnai ir maži vaikai visai nesapnuoja, nes sapnavimas yra labai priklausomas nuo kalbinių gebėjimų ir kalbos raidos. Pasak jų, sapnavimas yra kognityvinė veikla, kuriai reikalingos koncepcijos ir reprezentacijos.
+
 Nors yra žmonių, teigiančių, kad jie nesapnuoja, vis dėlto tikėtina, kad sapnuojame mes visi, jeigu neturime pažeidimų tam tikrose smegenų srityse, tiesiog mūsų gebėjimas prisiminti sapnus yra labai skirtingas. Kai kurie žmonės prisimena savo sapnus kiekvieną rytą, kai kurie neprisimena jų ištisus metus. Kaip rodo tyrimai, žmonių, prastai prisimenančių sapnus, smegenų aktyvumas minėtose su sapnų prisiminimu susijusiose smegenų srityse yra išties mažesnis tiek REM miego, tiek būdravimo metu, palyginti su tais, kurie gerai prisimena savo sapnus. Vis dėlto net ir itin prastai prisimenantys savo sapnus pažadinti miego laboratorijoje iš REM miego neretai papasakoja, ką jie ką tik sapnavo.
 `;
 
@@ -493,11 +499,21 @@ function renderSaving(){
   card.innerHTML = `<p class="center">Saugoma...</p>`;
 }
 
+function wpmCategory(wpm){
+  if(wpm == null) return "";
+  if(wpm < 200) return "Lėtas skaitymas";
+  if(wpm < 300) return "Vidutinis skaitymo greitis";
+  if(wpm < 400) return "Greitas skaitymas";
+  return "Labai greitas skaitymas";
+}
+
 function renderDone(){
+  const category = wpmCategory(state.wpm);
   card.innerHTML = `
     <h1>Ačiū!</h1>
     <p>Atsakymai išsaugoti anonimiškai. Testas baigtas.</p>
     <p>Jūsų skaitymo greitis: <strong>${state.wpm ?? "—"} WPM</strong></p>
+    ${category ? `<p class="wpm-category">${category}</p>` : ""}
   `;
 }
 
