@@ -163,11 +163,9 @@ textarea{min-height:90px;resize:vertical;}
   margin-bottom:28px;
 }
 .reading-text p{
-  margin:0 0 22px;
+  margin:0;
   text-align:justify;
-}
-.reading-text p:last-child{
-  margin-bottom:0;
+  text-indent:28px;
 }
 .reading-title{
   font-family:'Helvetica', 'sans-serif';
