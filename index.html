@@ -20,15 +20,15 @@
 
 const STUDY_INTRO = {
   title: "SKAITYMO GREIČIO TESTAS",
-  description: `Kviečiame dalyvauti skaitymo tyrime! <br><br>
-  Kasdien skaitome įvairiausius tekstus – knygas, naujienų portalus, socialinių tinklų įrašus ir daugybę kitų tekstų. Tačiau pats skaitymo procesas ir įpročiai, nuolat kinta. Vilniaus universiteto Kauno fakulteto Audiovizualinio vertimo studijų programos dėstytoja doc. dr. Jurgita Astrauskenė ir studentė Rusnė Abramavičiūtė atlieka tyrimą, kuris padės geriau suprasti skirtingų kartų skaitymo proceso ypatumus ir skaitymo įpročius.<br><br>
-  Jei Jums yra nuo 14 iki 61 metų, labai kviečiame prisidėti prie šio tyrimo. Jums tereikės atsakyti į kelis klausimus ir perskaityti nedidelės apimties tekstą. Tyrimas užtruks apie 5–10 minučių. Prisidėdami(-os) prie tyrimo padėsite surinkti moksliniam tyrimui svarbius duomenis, o tyrimo pabaigoje galėsite susipažinti ir su savo skaitymo rezultatais.<br><br>
-  Dalyvavimas tyrime yra visiškai savanoriškas, apklausa anoniminė, o surinkti duomenys bus naudojami tik mokslinio tyrimo tikslais. Nuoširdžiai dėkojame už Jūsų skirtą laiką ir pagalbą! Jeigu turėtumėte klausimų apie tyrimą, kviečiame susisiekti el. paštu <a href="mailto:jurgita.astrauskiene@knf.vu.lt">jurgita.astrauskiene@knf.vu.lt</a>`
+  description: `<p class="lead-p">Kviečiame dalyvauti skaitymo tyrime!</p>
+  <p class="lead-p">Kasdien skaitome įvairiausius tekstus – knygas, naujienų portalus, socialinių tinklų įrašus ir daugybę kitų tekstų. Tačiau pats skaitymo procesas ir įpročiai, nuolat kinta. Vilniaus universiteto Kauno fakulteto Audiovizualinio vertimo studijų programos dėstytoja doc. dr. Jurgita Astrauskenė ir studentė Rusnė Abramavičiūtė atlieka tyrimą, kuris padės geriau suprasti skirtingų kartų skaitymo proceso ypatumus ir skaitymo įpročius.</p>
+  <p class="lead-p">Jei Jums yra nuo 14 iki 61 metų, labai kviečiame prisidėti prie šio tyrimo. Jums tereikės atsakyti į kelis klausimus ir perskaityti nedidelės apimties tekstą. Tyrimas užtruks apie 5–10 minučių. Prisidėdami(-os) prie tyrimo padėsite surinkti moksliniam tyrimui svarbius duomenis, o tyrimo pabaigoje galėsite susipažinti ir su savo skaitymo rezultatais.</p>
+  <p class="lead-p">Dalyvavimas tyrime yra visiškai savanoriškas, apklausa anoniminė, o surinkti duomenys bus naudojami tik mokslinio tyrimo tikslais. Nuoširdžiai dėkojame už Jūsų skirtą laiką ir pagalbą! Jeigu turėtumėte klausimų apie tyrimą, kviečiame susisiekti el. paštu <a href="mailto:jurgita.astrauskiene@knf.vu.lt">jurgita.astrauskiene@knf.vu.lt</a></p>`
 };
 
 // Pradinės apklausos klausimai (rodomi po vieną)
 const SURVEY_QUESTIONS = [
-  { id: "q1", text: "Jūsų amžius", type: "select", options: Array.from({ length: 48 }, (_, i) => String(i + 14))},
+  { id: "q1", text: "Jūsų amžius", type: "select", options: Array.from({ length: 48 }, (_, i) => String(i + 14)) },
   { id: "q2", text: "Jūsų lytis", type: "choice", options: ["Vyras", "Moteris", "Nenoriu nurodyti"] },
   { id: "q3", text: "Aukščiausias baigtas arba šiuo metu siekiamas išsilavinimas", type: "choice", options: ["Šiuo metu mokausi mokykloje", "Vidurinis", "Profesinis", "Aukštesnysis", "Aukštasis (bakalauro)", "Aukštasis (magistro)", "Aukštasis (daktaro)"]},
   { id: "q4", text: "Gimtoji kalba (įrašyti)", type: "text" },
@@ -161,7 +161,7 @@ function render(){
 function renderLanding(){
   card.innerHTML = `
     <h1>${STUDY_INTRO.title}</h1>
-    <p>${STUDY_INTRO.description}</p>
+    ${STUDY_INTRO.description}
     <div class="btn-row">
       <button class="btn" id="startBtn">Pradėti</button>
     </div>
