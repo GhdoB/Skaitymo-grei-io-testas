@@ -65,8 +65,7 @@ function renderLogin(errorMsg){
 async function login(password){
   root.innerHTML = `<div class="login-box"><p>Kraunama...</p></div>`;
   try{
-    // Slaptažodis siunčiamas per header, o ne URL parametrą
-    const res = await fetch(`/api/admin-results`, {
+    // Slaptažodis siunčiamas per header, o ne URL parametrą 
       headers: { "x-admin-password": password }
     });
     const data = await res.json();
@@ -108,6 +107,7 @@ function renderResults(){
             <th>Supratimo atsakymai</th>
             <th>5 kl. / Rezultatas</th>
             <th>Paliko tabą</th>
+            <th>Įrenginys</th>
             <th>Veiksmai</th>
           </tr>
         </thead>
@@ -122,6 +122,7 @@ function renderResults(){
               <td style="${r.left_tab ? 'color:#b5502f;font-weight:bold;' : ''}">
                 ${r.left_tab ? `Taip (${r.left_tab_count ?? 0}×)` : "Ne"}
               </td>
+              <td>${r.device_type ?? "—"}</td>
               <td><button class="delete-btn" data-id="${r.id}">Ištrinti</button></td>
             </tr>
           `).join("")}
@@ -219,7 +220,7 @@ function formatJson(obj){
 function exportCsv(){
   const keysSurvey = [...new Set(allResults.flatMap(r => Object.keys(r.survey_answers || {})))];
   const keysComp = [...new Set(allResults.flatMap(r => Object.keys(r.comprehension_answers || {})))];
-  const header = ["created_at", "wpm", ...keysSurvey, ...keysComp.map(k => "comp_" + k), "c5_teisingai", "supratimo_proc", "left_tab", "left_tab_count"];
+  const header = ["created_at", "wpm", ...keysSurvey, ...keysComp.map(k => "comp_" + k), "c5_teisingai", "supratimo_proc", "left_tab", "left_tab_count", "irenginys"];
   const rows = allResults.map(r => {
     const { percent } = comprehensionScore(r);
     const c5Status = r.c5_correct === true ? "taip" : r.c5_correct === false ? "ne" : "nepatikrinta";
@@ -231,7 +232,8 @@ function exportCsv(){
       c5Status,
       (r.c5_correct === null || r.c5_correct === undefined) ? "" : percent,
       r.left_tab ? "taip" : "ne",
-      r.left_tab_count ?? 0
+      r.left_tab_count ?? 0,
+      csvSafe(r.device_type)
     ];
     return row.join(",");
   });
