@@ -36,6 +36,31 @@ module.exports = async (req, res) => {
     return;
   }
 
+  if (req.method === "PATCH") {
+    // Naudojama, kai adminas rankiniu būdu pažymi, ar 5-as (laisvo teksto)
+    // supratimo klausimas buvo atsakytas teisingai.
+    const { id, c5_correct } = req.body || {};
+    if (!id || typeof c5_correct !== "boolean") {
+      res.status(400).json({ error: "Trūksta id arba c5_correct (turi būti true/false)." });
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("responses")
+      .update({ c5_correct })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      res.status(500).json({ error: error.message });
+      return;
+    }
+
+    res.status(200).json({ result: data });
+    return;
+  }
+
   const { data, error } = await supabase
     .from("responses")
     .select("*")
