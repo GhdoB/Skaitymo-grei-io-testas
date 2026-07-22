@@ -283,7 +283,7 @@ function renderSurvey(){
     <div class="progress">Klausimas ${state.surveyIndex+1} / ${total}
       <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
     </div>
-    ${q.required === false ? `<p class="optional-tag">NEPRIVALOMA</p>` : ""}
+    ${q.required === false ? `<p class="optional-tag">KLAUSIMAS NEPRIVALOMAS</p>` : ""}
     <div class="question-text">${q.text}</div>
     ${inputHtml}
     <div class="btn-row">
