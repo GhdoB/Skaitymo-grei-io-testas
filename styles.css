@@ -188,11 +188,37 @@ textarea{min-height:90px;resize:vertical;}
 }
 .hidden{display:none;}
 .center{text-align:center;}
-.comp-question{margin-bottom:22px;}
+.comp-question{
+  margin-bottom: 18px;
+  padding: 20px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.comp-question:last-of-type{
+  margin-bottom: 22px;
+}
 .comp-question label{
-  display:block;
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
   font-size:16px;
-  margin-bottom:8px;
+  margin-bottom:14px;
+  line-height:1.5;
+}
+.comp-num{
+  flex-shrink:0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  background:var(--accent);
+  color:var(--paper);
+  font-family:'Helvetica', 'sans-serif';
+  font-size:13px;
+  font-weight:600;
 }
 .error-msg{color:var(--accent);font-size:13px;margin-top:8px;}
 .option.disabled-opt{
